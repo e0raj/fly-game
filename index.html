@@ -126,49 +126,12 @@
     width: 100%; display: flex; align-items: center; justify-content: space-between;
     padding: 10px 12px; border: none; border-radius: 11px; cursor: pointer;
     background: rgba(255,255,255,.05); color: rgba(255,255,255,.9);
+    text-decoration: none; -webkit-tap-highlight-color: transparent;
     font: 700 11.5px/1 ui-rounded, "Segoe UI", system-ui, sans-serif; letter-spacing: .03em;
     transition: background .16s ease;
   }
   .mlink:active { background: rgba(255,255,255,.13); }
   .mlink span { color: rgba(255,255,255,.35); font-size: 14px; }
-
-  /* pages */
-  #sheet {
-    position: fixed; inset: 0; z-index: 20;
-    display: flex; align-items: flex-end; justify-content: center;
-    background: rgba(4, 10, 20, .55);
-    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-    opacity: 0; pointer-events: none; transition: opacity .22s ease;
-  }
-  #sheet.open { opacity: 1; pointer-events: auto; }
-  .sheet-card {
-    width: min(520px, 100%);
-    max-height: 78vh; overflow-y: auto;
-    margin: 0 10px calc(env(safe-area-inset-bottom, 0px) + 10px);
-    padding: 20px 20px 24px;
-    border-radius: 22px;
-    background: #0f2135;
-    border: 1px solid rgba(255,255,255,.12);
-    box-shadow: 0 -10px 50px rgba(0,0,0,.45);
-    transform: translateY(24px); transition: transform .24s ease;
-    -webkit-overflow-scrolling: touch;
-  }
-  #sheet.open .sheet-card { transform: translateY(0); }
-  .sheet-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .sheet-top h2 { font: 900 19px/1.2 ui-rounded, "Segoe UI", system-ui, sans-serif; color: #ffe9a3; }
-  .sheet-x {
-    width: 34px; height: 34px; flex: 0 0 auto; border-radius: 50%;
-    border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.07);
-    color: #fff; cursor: pointer; display: grid; place-items: center;
-  }
-  .sheet-x svg { width: 15px; height: 15px; }
-  .sheet-body { color: rgba(255,255,255,.82); font-size: 13.5px; line-height: 1.62; }
-  .sheet-body p { margin: 0 0 11px; }
-  .sheet-body p:last-child { margin-bottom: 0; }
-  .sheet-body b { color: #ffffff; }
-  .sheet-body .kv { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
-  .sheet-body .kv:last-child { border-bottom: none; }
-  .sheet-body a { color: #8fd0ff; text-decoration: none; }
 
   /* character picker */
   #skins {
@@ -250,21 +213,9 @@
   </div>
 
   <div class="mlinks">
-    <button class="mlink" data-page="howto">How to play<span>›</span></button>
-    <button class="mlink" data-page="about">About<span>›</span></button>
-    <button class="mlink" data-page="privacy">Privacy<span>›</span></button>
-  </div>
-</div>
-
-<div id="sheet" aria-hidden="true">
-  <div class="sheet-card" role="dialog" aria-modal="true">
-    <div class="sheet-top">
-      <h2 id="sheetTitle"></h2>
-      <button class="sheet-x" id="sheetClose" aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12"/><path d="m18 6-12 12"/></svg>
-      </button>
-    </div>
-    <div class="sheet-body" id="sheetBody"></div>
+    <a class="mlink" href="how-to-play.html">How to play<span>›</span></a>
+    <a class="mlink" href="about.html">About<span>›</span></a>
+    <a class="mlink" href="privacy.html">Privacy<span>›</span></a>
   </div>
 </div>
 
@@ -823,10 +774,6 @@
   const statBest = document.getElementById("statBest");
   const statTop = document.getElementById("statTop");
   const verTxt = document.getElementById("verTxt");
-  const sheet = document.getElementById("sheet");
-  const sheetTitle = document.getElementById("sheetTitle");
-  const sheetBody = document.getElementById("sheetBody");
-  const sheetClose = document.getElementById("sheetClose");
 
   let menuOpen = false;
   let menuJustClosed = false;
@@ -883,65 +830,6 @@
     press.active = false;
     if (G.paused) initAudio();
   }
-
-  /* ---------------------------------------------------------- pages */
-  const PAGES = {
-    howto: {
-      title: "How to play",
-      body:
-        "<p>Tap anywhere to lift. Every tap gives a small push up and gravity pulls you gently back down, so a tap about once a second keeps you level.</p>" +
-        "<p>Fly through the gaps between the pipes. Touch a pipe or the ground and the run ends.</p>" +
-        "<p><b>Perfect gap</b> — thread a pipe dead centre for two points and a chime.</p>" +
-        "<p><b>Characters</b> — swipe left or right on the start screen, or tap a portrait at the bottom. All four fly on exactly the same physics.</p>" +
-        "<p><b>Difficulty</b> — CHILL, NORMAL and INSANE sit in this menu. Opening the menu mid-flight pauses the game.</p>",
-    },
-    about: {
-      title: "About",
-      body:
-        "<p><b>Fly</b> is a tiny arcade game that lives in one HTML file — no engine, no libraries, no image or audio assets. Every character, cloud, pipe and sound is drawn or generated in code.</p>" +
-        "<div class=\"kv\"><span>Version</span><b>v" + "1.1.0" + "</b></div>" +
-        "<div class=\"kv\"><span>Made by</span><b>@e0raj</b></div>" +
-        "<div class=\"kv\"><span>Instagram</span><b><a href=\"https://instagram.com/e0raj\" target=\"_blank\" rel=\"noopener noreferrer\">instagram.com/e0raj</a></b></div>" +
-        "<div class=\"kv\"><span>Source</span><b><a href=\"https://github.com/e0raj/fly-game\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/e0raj/fly-game</a></b></div>",
-    },
-    privacy: {
-      title: "Privacy",
-      body:
-        "<p>Nothing leaves your device. This game has no accounts, no analytics, no advertising and no server.</p>" +
-        "<p>It keeps a few small preferences in your browser's local storage: your best score, your top five scores, and your character, difficulty and sound choices. That data never leaves the page, and clearing your browser data removes it.</p>" +
-        "<p>The only links out are to Instagram and GitHub, which open in a new tab when you tap them.</p>",
-    },
-  };
-
-  function openSheet(key) {
-    const p = PAGES[key];
-    if (!p || !sheet) return;
-    sheetTitle.textContent = p.title;
-    sheetBody.innerHTML = p.body;
-    sheet.classList.add("open");
-    sheet.setAttribute("aria-hidden", "false");
-    setMenu(false);
-    initAudio();
-    sfxTick();
-  }
-
-  function closeSheet() {
-    if (!sheet) return;
-    sheet.classList.remove("open");
-    sheet.setAttribute("aria-hidden", "true");
-  }
-
-  if (sheetClose) sheetClose.addEventListener("click", (e) => { e.stopPropagation(); closeSheet(); });
-  if (sheet) sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSheet(); });
-
-  const linkEls = document.querySelectorAll ? document.querySelectorAll(".mlink") : [];
-  Array.prototype.forEach.call(linkEls, (el) => {
-    el.addEventListener("pointerdown", (e) => e.stopPropagation());
-    el.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openSheet(el.getAttribute("data-page"));
-    });
-  });
 
   function setMenu(open) {
     menuOpen = open;
