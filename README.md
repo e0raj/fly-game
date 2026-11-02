@@ -1,14 +1,16 @@
-# SW — Birds Flip
+# Bird Flip
 
-A tiny, fast, one-file browser game. Tap to flap, slip through the pipes, don't kiss the ground.
+A full-screen, one-file browser game. Tap to flap, thread the pipes, don't touch the ground.
 
-No build step, no dependencies, no assets — the whole game is a single `index.html` with a canvas and vanilla JavaScript.
+No build step, no dependencies, no assets — the entire game is a single `index.html` with a canvas and vanilla JavaScript.
 
 ## Play
 
-Open `index.html` in any browser. That's it.
+Open `index.html` in any browser, or play it online:
 
-Or serve it locally:
+**https://e0raj.github.io/bird-flip-game/**
+
+Locally:
 
 ```bash
 python3 -m http.server 8000
@@ -20,45 +22,60 @@ python3 -m http.server 8000
 | Action | Input |
 | --- | --- |
 | Flap | `Space` / `↑` / `W` / click / tap |
-| Mute | `M` |
+| Mute | `M` or the speaker button |
+| Fullscreen | `F` or the corner button |
 | Restart | `R` |
-| Play again | tap after the game-over card appears |
+| Play again | tap after the game-over card |
 
-## What's in it
+## How it is built
 
-- Fixed 420×700 logical canvas, scaled to fit any screen (phone, tablet, desktop) at device pixel ratio — crisp on retina displays.
-- Physics tuned for a short learning curve: gravity, terminal rotation, and a wing that actually flips when you flap.
-- Procedural pipe field: gap size fixed, gap position random, scroll speed ramps up with your score.
-- Parallax sky with sun glow, drifting clouds, two hill layers and a scrolling ground strip.
-- Particle puffs on every flap, sparks on every point, a feather burst on impact.
-- Screen shake and a white flash on death.
-- Score, best score persisted in `localStorage`, and medals (Bronze 5, Silver 12, Gold 25, Platinum 40).
-- Sound effects generated on the fly with the Web Audio API — no audio files, so nothing to download.
-- Pauses itself to the ready screen when you switch tabs, so you never lose a run to a background tab.
+**Full screen, always.** The world uses a virtual coordinate space that is always 720 units tall; the width is derived from the viewport aspect ratio on every resize. So the canvas fills any phone, tablet, laptop or ultrawide monitor with no letterboxing and no stretched art — only more of the world becomes visible. Everything is drawn through one scaled transform at device pixel ratio, so it stays sharp on retina screens.
+
+**The bird.** The bird is drawn procedurally, not from a sprite sheet:
+
+- A two-stage wing stroke — a fast downstroke on every tap that settles into a gentle idle flutter — driven by a damped interpolation, so it never snaps.
+- Separate back wing, front wing with layered feathers, tail that sways against vertical velocity, and a beak that opens slightly mid-stroke.
+- Rotation eases toward a target derived from velocity, giving a smooth dive-and-climb arc instead of a linear tilt.
+- Squash and stretch on flap, plus velocity-based stretch while falling.
+- A pupil that tracks vertical motion and a random blink every few seconds.
+- A soft ground shadow that shrinks as the bird climbs.
+
+**Sound.** All effects are synthesised live with the Web Audio API, so there are no audio files to download:
+
+- Flap — a bandpass-swept noise whoosh layered with a short falling sine.
+- Score — a two-note sine chime that rises in pitch as your streak grows.
+- Impact — a low sine thud with a filtered noise crack, followed by a falling whistle.
+- New best — a four-note arpeggio.
+
+Mute state is remembered between visits.
+
+**Scenery.** A three-stop sky gradient with a sun halo, drifting volumetric clouds, far birds, two parallax hill ridges, a tree-line silhouette, and a scrolling ground with grass blades and dirt texture. A vignette sits over the whole scene.
+
+**Game feel.** Particle puffs on each flap, sparks on each point, a feather burst on impact, screen shake and a white flash on death, a score counter that rolls up instead of jumping, medals (Bronze 5, Silver 12, Gold 25, Platinum 40), and a best score saved in `localStorage`. The game pauses itself to the title screen when you switch tabs so you never lose a run to a background tab.
 
 ## Structure
 
 ```
-sw/
+bird-flip-game/
 └── index.html    # everything: markup, styles, game loop, rendering, audio
 ```
 
-Inside the file, the code is split into clear sections: tuning constants, audio, state, input, update, drawing, and the `requestAnimationFrame` loop.
+Inside the file the code is split into clearly labelled sections: tuning, state, resize, audio, scenery, gameplay, input, update, drawing helpers, the bird, HUD, render, and the animation loop.
 
 ## Tuning it
 
 The feel lives in a handful of constants near the top of the script:
 
 ```js
-const GRAVITY   = 1500;  // px/s²
-const FLAP      = -430;  // upward impulse
-const GAP       = 172;   // pipe gap height
-const SPACING   = 240;   // distance between pipes
-const BASE_SPEED = 168;  // starting scroll speed
-const MAX_SPEED  = 300;  // speed cap
+const GRAVITY    = 2100;  // px/s²
+const FLAP       = -615;  // upward impulse
+const GAP        = 196;   // pipe gap height
+const SPACING    = 318;   // distance between pipes
+const BASE_SPEED = 235;   // starting scroll speed
+const MAX_SPEED  = 375;   // speed cap
 ```
 
-Want it easier? Widen `GAP` or lower `BASE_SPEED`. Want it brutal? Shrink the gap and raise `MAX_SPEED`.
+Easier: widen `GAP` or lower `BASE_SPEED`. Harder: shrink the gap and raise `MAX_SPEED`.
 
 ## License
 
