@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Bird Flip</title>
+<title>Fly</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
@@ -22,6 +22,27 @@
   .ui {
     position: absolute; top: 0; right: 0; z-index: 5; display: flex; gap: 10px;
     padding: calc(env(safe-area-inset-top, 0px) + 14px) calc(env(safe-area-inset-right, 0px) + 14px) 0 0;
+  }
+  .ui.left {
+    right: auto; left: 0;
+    padding: calc(env(safe-area-inset-top, 0px) + 14px) 0 0 calc(env(safe-area-inset-left, 0px) + 14px);
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 44px; padding: 0 16px 0 13px; border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(12,24,38,.42);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: #fff; text-decoration: none;
+    font-size: 14px; font-weight: 700; letter-spacing: .01em;
+    transition: background .2s ease, transform .12s ease, border-color .2s ease;
+  }
+  .pill:hover { background: rgba(12,24,38,.62); border-color: rgba(255,255,255,.34); }
+  .pill:active { transform: scale(.95); }
+  .pill svg { width: 20px; height: 20px; display: block; }
+  @media (max-width: 430px) {
+    .pill span { display: none; }
+    .pill { width: 44px; padding: 0; justify-content: center; border-radius: 50%; }
   }
   .btn {
     width: 44px; height: 44px; border-radius: 50%;
@@ -66,6 +87,18 @@
 </head>
 <body>
 <canvas id="game"></canvas>
+
+<div class="ui left">
+  <a class="pill" href="https://instagram.com/e0raj" target="_blank" rel="noopener noreferrer"
+     aria-label="Instagram, @e0raj" title="@e0raj on Instagram">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2.4" y="2.4" width="19.2" height="19.2" rx="5.6"/>
+      <circle cx="12" cy="12" r="4.3"/>
+      <circle cx="17.5" cy="6.5" r="1.15" fill="currentColor" stroke="none"/>
+    </svg>
+    <span>@e0raj</span>
+  </a>
+</div>
 
 <div class="ui">
   <button class="btn" id="soundBtn" aria-label="Toggle sound" title="Sound (M)">
@@ -156,6 +189,8 @@
     overAt: 0,
     newBest: false,
     hudScore: 0,
+    scorePop: 0,
+    ripples: [],
   };
 
   try {
@@ -338,8 +373,8 @@
     bird.rot = 0;
     bird.boost = 0;
     bird.squash = 0;
-    G.score = 0; G.hudScore = 0;
-    G.pipes = []; G.parts = [];
+    G.score = 0; G.hudScore = 0; G.scorePop = 0;
+    G.pipes = []; G.parts = []; G.ripples = [];
     G.speed = BASE_SPEED;
     G.scroll = 0;
     G.shake = 0; G.flash = 0;
@@ -443,6 +478,14 @@
   function tap(e) {
     if (e && e.cancelable) e.preventDefault();
     flap();
+    if (G.state === "play") {
+      const rect = cvs.getBoundingClientRect ? cvs.getBoundingClientRect() : null;
+      const rw = rect && rect.width ? rect.width : window.innerWidth;
+      const rh = rect && rect.height ? rect.height : window.innerHeight;
+      const px = e && typeof e.clientX === "number" ? (e.clientX - (rect ? rect.left : 0)) * (VW / rw) : bird.x;
+      const py = e && typeof e.clientY === "number" ? (e.clientY - (rect ? rect.top : 0)) * (VH / rh) : bird.y;
+      G.ripples.push({ x: px, y: py, life: 0.5, max: 0.5 });
+    }
   }
   cvs.addEventListener("pointerdown", tap, { passive: false });
 
@@ -555,6 +598,11 @@
     G.t += dt;
     G.shake *= Math.pow(0.0015, dt);
     G.flash = Math.max(0, G.flash - dt * 3.4);
+    G.scorePop = Math.max(0, G.scorePop - dt * 3.2);
+    for (let i = G.ripples.length - 1; i >= 0; i--) {
+      G.ripples[i].life -= dt;
+      if (G.ripples[i].life <= 0) G.ripples.splice(i, 1);
+    }
 
     const drift = G.state === "play" ? G.speed * 0.1 : 8;
     for (const c of G.clouds) {
@@ -643,6 +691,7 @@
         G.score++;
         sfxScore(G.score);
         G.flash = Math.max(G.flash, 0.14);
+        G.scorePop = 1;
         sparks(bird.x + 15, bird.y);
       }
       const topH = p.gapY - GAP / 2;
@@ -1301,17 +1350,32 @@
   function drawScore() {
     if (G.state === "ready") return;
     const s = String(Math.round(G.hudScore));
+    const pop = 1 + G.scorePop * 0.15;
     ctx.save();
+    ctx.translate(VW / 2, 128);
+    ctx.scale(pop, pop);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = "800 76px ui-rounded, Segoe UI, system-ui, sans-serif";
     ctx.lineJoin = "round";
     ctx.lineWidth = 12;
     ctx.strokeStyle = "rgba(14,28,44,.45)";
-    ctx.strokeText(s, VW / 2, 128);
+    ctx.strokeText(s, 0, 0);
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(s, VW / 2, 128);
+    ctx.fillText(s, 0, 0);
     ctx.restore();
+  }
+
+  function drawRipples() {
+    for (const r of G.ripples) {
+      const a = Math.max(0, r.life / r.max);
+      const rad = 8 + (1 - a) * 42;
+      ctx.strokeStyle = "rgba(255,255,255," + (a * 0.35).toFixed(3) + ")";
+      ctx.lineWidth = 2 + a * 2;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, rad, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
 
   function medal(score) {
@@ -1329,25 +1393,43 @@
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.font = "900 60px ui-rounded, Segoe UI, system-ui, sans-serif";
+    // wordmark, breathing very slightly
+    const breathe = 1 + Math.sin(G.t * 1.5) * 0.012;
+    ctx.save();
+    ctx.translate(cx, 172);
+    ctx.scale(breathe, breathe);
+    ctx.font = "900 86px ui-rounded, Segoe UI, system-ui, sans-serif";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 14;
+    ctx.lineWidth = 16;
     ctx.strokeStyle = "rgba(12,30,48,.5)";
-    const title = skin.label + " FLIP";
-    ctx.strokeText(title, cx, 176);
-    const tg = ctx.createLinearGradient(0, 140, 0, 205);
+    ctx.strokeText("FLY", 0, 0);
+    const tg = ctx.createLinearGradient(0, -44, 0, 42);
     tg.addColorStop(0, "#ffffff");
     tg.addColorStop(0.55, "#ffe9a3");
     tg.addColorStop(1, "#ffc53d");
     ctx.fillStyle = tg;
-    ctx.fillText(title, cx, 176);
+    ctx.fillText("FLY", 0, 0);
+    ctx.restore();
 
-    ctx.font = "700 15px ui-rounded, Segoe UI, system-ui, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,.82)";
-    ctx.fillText("TAP  ·  FLAP  ·  DON'T CRASH", cx, 220);
+    // which character is flying
+    ctx.font = "800 13px ui-rounded, Segoe UI, system-ui, sans-serif";
+    const label = skin.label;
+    const bw2 = Math.max(104, ctx.measureText(label).width + 44), bh2 = 32;
+    const bx2 = cx - bw2 / 2, by2 = 224 - bh2 / 2;
+    ctx.fillStyle = "rgba(10,26,42,.46)";
+    roundRect(ctx, bx2, by2, bw2, bh2, 16); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.2)"; ctx.lineWidth = 1.4; ctx.stroke();
+    ctx.fillStyle = "#8ce07a";
+    ctx.beginPath(); ctx.arc(bx2 + 17, by2 + bh2 / 2, 3.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(label, bx2 + bw2 / 2 + 8, by2 + bh2 / 2 + 1);
+
+    ctx.font = "700 14px ui-rounded, Segoe UI, system-ui, sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,.78)";
+    ctx.fillText("TAP  ·  FLAP  ·  DON'T CRASH", cx, 272);
 
     if (G.best > 0) {
-      const bw = 150, bh = 36, bx = cx - bw / 2, by = 246;
+      const bw = 150, bh = 36, bx = cx - bw / 2, by = 296;
       ctx.fillStyle = "rgba(10,26,42,.42)";
       roundRect(ctx, bx, by, bw, bh, 18); ctx.fill();
       ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5; ctx.stroke();
@@ -1467,6 +1549,7 @@
     drawParticles("back");
     drawPlayer();
     drawParticles("front");
+    drawRipples();
     ctx.restore();
 
     drawVignette();
