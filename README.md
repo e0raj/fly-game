@@ -24,12 +24,11 @@ Made by [@e0raj](https://instagram.com/e0raj) — the Instagram pill sits in the
 | Action | Input |
 | --- | --- |
 | Lift | `Space` / `↑` / `W` / click / tap |
-| Mute | `M` or the speaker button |
-| Fullscreen | `F` or the corner button |
-| Pause | `P` or the pause button |
+| Mute | `M`, or Sound in the menu |
+| Pause | `P`, or Pause in the menu |
 | Restart | `R` |
 | Change character | swipe left / right, press `←` `→`, tap a portrait, or press `1`–`4` |
-| Difficulty | the CHILL / NORMAL / INSANE pill, top right |
+| Difficulty | CHILL / NORMAL / INSANE in the menu |
 | Share your score | the SHARE SCORE button on the game-over screen |
 | Play again | tap after the game-over card |
 
@@ -46,7 +45,7 @@ Four characters. Swipe left or right anywhere on the start or game-over screen t
 
 ## Difficulty
 
-Three modes, cycled from the pill in the top-right corner and remembered between visits:
+Three modes, chosen from the menu in the top-right corner and remembered between visits:
 
 | Mode | Gap | Speed |
 | --- | --- | --- |
@@ -59,6 +58,10 @@ Three modes, cycled from the pill in the top-right corner and remembered between
 - One point for clearing a pipe.
 - **Two points and a chime for threading it dead centre** — a small reward for flying with control rather than scraping the gap.
 - Your best score and a local top five are kept on the device.
+
+## The menu
+
+Everything that is not the game itself lives behind one button. The top-right corner holds a hamburger that opens a small panel with the difficulty segmented control, Pause / Resume and the sound switch. Opening the menu mid-round pauses the game for you, tapping anywhere else closes it without flapping, and the panel never covers the playfield for long.
 
 ## How it is built
 
