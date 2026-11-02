@@ -66,17 +66,50 @@
   .btn.muted .on { display: none; }
   .btn.muted .off { display: block; }
 
-  .modebtn {
-    height: 44px; padding: 0 15px; border-radius: 22px;
-    border: 1px solid rgba(255,255,255,.22);
-    background: rgba(12,24,38,.42);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    color: #fff; font: 800 11px/1 ui-rounded, "Segoe UI", system-ui, sans-serif;
-    letter-spacing: .1em; cursor: pointer;
-    transition: transform .12s ease, background .2s ease;
+  /* menu */
+  #menuBtn .x { display: none; }
+  #menuBtn.open .burger { display: none; }
+  #menuBtn.open .x { display: block; }
+
+  #menu {
+    position: absolute; z-index: 9;
+    top: calc(env(safe-area-inset-top, 0px) + 68px);
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    width: 214px; padding: 13px;
+    border-radius: 18px;
+    background: rgba(10, 22, 38, .84);
+    border: 1px solid rgba(255,255,255,.16);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    display: flex; flex-direction: column; gap: 13px;
+    transform-origin: top right;
+    opacity: 0; pointer-events: none; transform: scale(.95) translateY(-6px);
+    transition: opacity .18s ease, transform .18s ease;
   }
-  .modebtn:hover { background: rgba(12,24,38,.62); }
-  .modebtn:active { transform: scale(.94); }
+  #menu.open { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
+  .mlabel {
+    display: block; margin-bottom: 7px;
+    font: 800 9px/1 ui-rounded, "Segoe UI", system-ui, sans-serif;
+    letter-spacing: .16em; color: rgba(255,255,255,.45);
+  }
+  .seg { display: flex; gap: 4px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,.07); }
+  .seg button {
+    flex: 1; padding: 8px 0; border: none; border-radius: 8px; cursor: pointer;
+    background: transparent; color: rgba(255,255,255,.66);
+    font: 800 9.5px/1 ui-rounded, "Segoe UI", system-ui, sans-serif; letter-spacing: .06em;
+    transition: background .16s ease, color .16s ease;
+  }
+  .seg button.active { background: rgba(255,214,87,.92); color: #2a1a05; }
+  .mbtn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border: none; border-radius: 11px; cursor: pointer;
+    background: rgba(255,255,255,.07); color: #fff;
+    font: 800 11px/1 ui-rounded, "Segoe UI", system-ui, sans-serif; letter-spacing: .04em;
+    transition: background .16s ease;
+  }
+  .mbtn:active { background: rgba(255,255,255,.14); }
+  .mbtn .val { color: rgba(255,255,255,.5); font-weight: 700; }
+  .mbtn.on .val { color: #8ce07a; }
 
   #shareBtn {
     position: absolute; z-index: 7; left: 50%;
@@ -148,17 +181,25 @@
 </div>
 
 <div class="ui">
-  <button class="modebtn" id="modeBtn" aria-label="Difficulty" title="Difficulty">NORMAL</button>
-  <button class="btn" id="pauseBtn" aria-label="Pause" title="Pause (P)">
-    <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5v14"/><path d="M15 5v14"/></svg>
+  <button class="btn" id="menuBtn" aria-label="Menu" aria-expanded="false" title="Menu">
+    <svg class="burger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+    <svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 6 12 12"/><path d="m18 6-12 12"/></svg>
   </button>
-  <button class="btn" id="soundBtn" aria-label="Toggle sound" title="Sound (M)">
-    <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
-    <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m16 9 5 6"/><path d="m21 9-5 6"/></svg>
-  </button>
-  <button class="btn" id="fsBtn" aria-label="Toggle fullscreen" title="Fullscreen (F)">
-    <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-  </button>
+</div>
+
+<div id="menu" role="menu">
+  <div>
+    <span class="mlabel">DIFFICULTY</span>
+    <div class="seg" id="segModes"></div>
+  </div>
+  <div>
+    <span class="mlabel">GAME</span>
+    <button class="mbtn" id="pauseBtn"><span id="pauseTxt">Pause</span><span class="val" id="pauseVal">RUNNING</span></button>
+  </div>
+  <div>
+    <span class="mlabel">SOUND</span>
+    <button class="mbtn on" id="soundBtn"><span>Sound effects</span><span class="val" id="soundVal">ON</span></button>
+  </div>
 </div>
 
 <div id="skins"></div>
@@ -280,8 +321,6 @@
     GAP = m.gap;
     BASE_SPEED = m.base;
     MAX_SPEED = m.max;
-    const btn = document.getElementById("modeBtn");
-    if (btn) btn.textContent = m.name;
   }
 
   function buzz(pattern) {
@@ -644,7 +683,9 @@
     press.active = true;
     press.x = typeof e.clientX === "number" ? e.clientX : 0;
     press.y = typeof e.clientY === "number" ? e.clientY : 0;
-    if (G.paused) { G.paused = false; return; }
+    if (menuJustClosed) { menuJustClosed = false; return; }
+    if (menuOpen) { setMenu(false); return; }
+    if (G.paused) { G.paused = false; syncPauseUI(); return; }
     if (G.state === "play") {
       flap();
       addRipple(e);
@@ -681,7 +722,6 @@
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") { e.preventDefault(); flap(); }
     else if (e.code === "KeyM") { toggleSound(); }
-    else if (e.code === "KeyF") { toggleFullscreen(); }
     else if (e.code === "KeyP") { togglePause(); }
     else if (e.code === "KeyR") { G.paused = false; G.state = "ready"; reset(); }
     else if (e.code === "ArrowRight") { e.preventDefault(); cycleSkin(1); }
@@ -696,52 +736,100 @@
   });
 
   /* ---------------------------------------------------------- buttons */
-  const soundBtn = document.getElementById("soundBtn");
-  const fsBtn = document.getElementById("fsBtn");
   const skinsBar = document.getElementById("skins");
-
-  function toggleSound() {
-    muted = !muted;
-    soundBtn.classList.toggle("muted", muted);
-    try { localStorage.setItem("birdflip_muted", muted ? "1" : "0"); } catch (e) {}
-    if (!muted) { initAudio(); sfxScore(0); }
-  }
-  soundBtn.classList.toggle("muted", muted);
-  soundBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleSound(); });
-
-  function toggleFullscreen() {
-    const el = document.documentElement;
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      const fn = el.requestFullscreen || el.webkitRequestFullscreen;
-      if (fn) { const p = fn.call(el, { navigationUI: "hide" }); if (p && p.catch) p.catch(() => {}); }
-    } else {
-      const exit = document.exitFullscreen || document.webkitExitFullscreen;
-      if (exit) { const p = exit.call(document); if (p && p.catch) p.catch(() => {}); }
-    }
-  }
-  fsBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleFullscreen(); });
-
-  const modeBtn = document.getElementById("modeBtn");
-  const pauseBtn = document.getElementById("pauseBtn");
   const shareBtn = document.getElementById("shareBtn");
+  const menuBtn = document.getElementById("menuBtn");
+  const menu = document.getElementById("menu");
+  const segModes = document.getElementById("segModes");
+  const pauseBtn = document.getElementById("pauseBtn");
+  const pauseTxt = document.getElementById("pauseTxt");
+  const pauseVal = document.getElementById("pauseVal");
+  const soundBtn = document.getElementById("soundBtn");
+  const soundVal = document.getElementById("soundVal");
 
-  modeBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    G.mode = (G.mode + 1) % MODES.length;
+  let menuOpen = false;
+  let menuJustClosed = false;
+  const modeBtns = [];
+
+  MODES.forEach((m, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = m.name;
+    b.addEventListener("pointerdown", (e) => e.stopPropagation());
+    b.addEventListener("click", (e) => { e.stopPropagation(); setMode(i); });
+    segModes.appendChild(b);
+    modeBtns.push(b);
+  });
+
+  function syncModeUI() {
+    modeBtns.forEach((b, i) => b.classList.toggle("active", i === G.mode));
+  }
+
+  function setMode(i) {
+    G.mode = i;
     applyMode();
+    syncModeUI();
     try { localStorage.setItem("fly_mode", String(G.mode)); } catch (err) {}
     if (G.state !== "play") { G.state = "ready"; reset(); }
     initAudio();
     sfxTick();
-  });
+  }
+
+  function syncSoundUI() {
+    soundVal.textContent = muted ? "OFF" : "ON";
+    soundBtn.classList.toggle("on", !muted);
+  }
+
+  function toggleSound() {
+    muted = !muted;
+    syncSoundUI();
+    try { localStorage.setItem("birdflip_muted", muted ? "1" : "0"); } catch (e) {}
+    if (!muted) { initAudio(); sfxScore(0); }
+  }
+  soundBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleSound(); });
+  syncSoundUI();
+
+  function syncPauseUI() {
+    pauseTxt.textContent = G.paused ? "Resume" : "Pause";
+    pauseVal.textContent = G.paused ? "PAUSED" : "RUNNING";
+    pauseBtn.classList.toggle("on", !G.paused);
+  }
 
   function togglePause() {
     if (G.state !== "play") return;
     G.paused = !G.paused;
     press.active = false;
     if (G.paused) initAudio();
+    syncPauseUI();
   }
   pauseBtn.addEventListener("click", (e) => { e.stopPropagation(); togglePause(); });
+
+  function setMenu(open) {
+    menuOpen = open;
+    menu.classList.toggle("open", open);
+    menuBtn.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) {
+      syncModeUI();
+      syncPauseUI();
+      syncSoundUI();
+      if (G.state === "play" && !G.paused) togglePause();
+    }
+  }
+
+  menuBtn.addEventListener("click", (e) => { e.stopPropagation(); setMenu(!menuOpen); });
+
+  document.addEventListener("pointerdown", (e) => {
+    if (!menuOpen) return;
+    const t = e.target;
+    if (menu.contains && t && menu.contains(t)) return;
+    if (menuBtn.contains && t && menuBtn.contains(t)) return;
+    setMenu(false);
+    menuJustClosed = true;
+  }, true);
+
+  syncModeUI();
+  syncPauseUI();
 
   function syncShareVisibility() {
     if (shareBtn) shareBtn.classList.toggle("show", G.state === "over");
