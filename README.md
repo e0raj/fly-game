@@ -26,8 +26,11 @@ Made by [@e0raj](https://instagram.com/e0raj) — the Instagram pill sits in the
 | Lift | `Space` / `↑` / `W` / click / tap |
 | Mute | `M` or the speaker button |
 | Fullscreen | `F` or the corner button |
+| Pause | `P` or the pause button |
 | Restart | `R` |
 | Change character | swipe left / right, press `←` `→`, tap a portrait, or press `1`–`4` |
+| Difficulty | the CHILL / NORMAL / INSANE pill, top right |
+| Share your score | the SHARE SCORE button on the game-over screen |
 | Play again | tap after the game-over card |
 
 ## Characters
@@ -41,6 +44,22 @@ Four characters. Swipe left or right anywhere on the start or game-over screen t
 | **Paper plane** | Two folded wings that flutter as it glides, with a crease down the middle |
 | **Auto-rickshaw** | Yellow-and-black body, spinning wheels, windshield and headlight |
 
+## Difficulty
+
+Three modes, cycled from the pill in the top-right corner and remembered between visits:
+
+| Mode | Gap | Speed |
+| --- | --- | --- |
+| **CHILL** | 238 | 168 → 250 |
+| **NORMAL** | 186 | 205 → 320 |
+| **INSANE** | 146 | 242 → 385 |
+
+## Scoring
+
+- One point for clearing a pipe.
+- **Two points and a chime for threading it dead centre** — a small reward for flying with control rather than scraping the gap.
+- Your best score and a local top five are kept on the device.
+
 ## How it is built
 
 **Full screen, always.** The world uses a virtual coordinate space that is always 720 units tall; the width is derived from the viewport aspect ratio on every resize. So the canvas fills any phone, tablet, laptop or ultrawide monitor with no letterboxing and no stretched art — only more of the world becomes visible. Everything is drawn through one scaled transform at device pixel ratio, so it stays sharp on retina screens.
@@ -51,9 +70,13 @@ Four characters. Swipe left or right anywhere on the start or game-over screen t
 
 **The characters.** Every one is drawn procedurally, not from a sprite sheet, and the picker portraits are painted by the same drawing code — what you see in the thumbnail is exactly what flies.
 
+**Day into night.** The sky is driven by your score: it starts as bright day, warms into sunset around twenty points, and settles into night past thirty — the sun sinks and fades, the moon rises, and stars fade in. A soft night wash keeps the green pipes readable against the dark.
+
 **Scenery.** A three-stop sky gradient with a sun halo, drifting volumetric clouds, far birds, two parallax hill ridges, a tree-line silhouette, and a scrolling ground with grass blades and dirt texture. Every layer is drawn from a seamlessly repeating pattern — the ridges are sums of sines whose wavelengths divide the tile exactly, and the trees are keyed to their world index — so nothing ever pops or jumps as it scrolls past. A vignette sits over the whole scene.
 
-**Feel.** A ripple at the point you tap, particle puffs behind the character, sparks and a scale-pop on the score for every point, a feather burst and screen shake on impact, a rolling score counter, medals (Bronze 5, Silver 12, Gold 25, Platinum 40), and a best score saved in `localStorage`. The game pauses itself to the title screen when you switch tabs so you never lose a run to a background tab.
+**Feel.** A ripple at the point you tap, particle puffs behind the character, sparks and a scale-pop on the score for every point, a feather burst and screen shake on impact, a rolling score counter, medals (Bronze 5, Silver 12, Gold 25, Platinum 40), confetti when you beat your best, and a local top five saved in `localStorage`. Pausing stops the simulation dead rather than freezing the screen mid-frame. On phones a short haptic tick lands on each lift and a longer buzz on a crash, and `prefers-reduced-motion` turns the shake and confetti off for anyone who asks for less movement.
+
+**Share card.** The game-over screen has a SHARE SCORE button that draws a 1080×1350 card — the character, your score, your best, the medal and `@e0raj` — then hands it to the system share sheet, or downloads it as a PNG where sharing files is not supported. It is sized for an Instagram story. The game pauses itself to the title screen when you switch tabs so you never lose a run to a background tab.
 
 **Sound.** All effects are synthesised live with the Web Audio API, so there are no audio files to download:
 
