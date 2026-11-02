@@ -104,9 +104,9 @@
   let FLOOR_Y = VH - GROUND_H;
 
   /* ---------------------------------------------------------- tuning */
-  const GRAVITY    = 1480;
-  const FLAP       = -505;
-  const MAX_FALL   = 940;
+  const GRAVITY    = 640;    // light gravity: the character glides, it does not plummet
+  const FLAP       = -305;   // a gentle lift, so a few taps keep you up
+  const MAX_FALL   = 330;    // slow terminal sink — you always have time to react
   const PIPE_W     = 78;
   const GAP        = 186;
   const SPACING    = 276;
@@ -603,7 +603,7 @@
     }
 
     if (G.state === "over") {
-      bird.vy = Math.min(bird.vy + GRAVITY * 0.9 * dt, MAX_FALL);
+      bird.vy = Math.min(bird.vy + GRAVITY * 2.6 * dt, 920);
       bird.y += bird.vy * dt;
       if (bird.y > FLOOR_Y - BIRD_R) {
         bird.y = FLOOR_Y - BIRD_R;
@@ -618,9 +618,9 @@
     bird.y += bird.vy * dt;
 
     if (bird.vy < 0) {
-      bird.rot = lerp(bird.rot, -0.48, Math.min(1, dt * 22));
+      bird.rot = lerp(bird.rot, -0.40, Math.min(1, dt * 14));
     } else {
-      bird.rot = Math.min(1.5, bird.rot + dt * (2.4 + (bird.vy / MAX_FALL) * 3.4));
+      bird.rot = Math.min(0.95, bird.rot + dt * (0.9 + (bird.vy / MAX_FALL) * 1.6));
     }
     bird.tail = clamp(-bird.vy * 0.0004, -0.12, 0.2) + Math.sin(G.t * 7) * 0.05;
 
