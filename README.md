@@ -17,7 +17,7 @@ python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
 
-Made by [@e0raj](https://instagram.com/e0raj).
+Made by [@e0raj](https://instagram.com/e0raj) — the Instagram pill sits in the top-left corner of the game.
 
 ## Controls
 
@@ -27,12 +27,12 @@ Made by [@e0raj](https://instagram.com/e0raj).
 | Mute | `M` or the speaker button |
 | Fullscreen | `F` or the corner button |
 | Restart | `R` |
-| Change character | tap a portrait in the picker, or press `1`–`4` |
+| Change character | swipe left / right, press `←` `→`, tap a portrait, or press `1`–`4` |
 | Play again | tap after the game-over card |
 
 ## Characters
 
-Four characters, switchable from the picker at the bottom of the screen. All of them fly on exactly the same physics and share the same hitbox, so the game is never easier or harder depending on who you pick — only the look, the tilt and the trail change. Your choice is remembered between visits.
+Four characters. Swipe left or right anywhere on the start or game-over screen to flick between them — the picker at the bottom mirrors the choice, and tapping a portrait works too. All of them fly on exactly the same physics and share the same hitbox, so the game is never easier or harder depending on who you pick — only the look, the tilt and the trail change. Your choice is remembered between visits.
 
 | Character | What it looks like |
 | --- | --- |
