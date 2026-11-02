@@ -1,6 +1,6 @@
 # Bird Flip
 
-A full-screen, one-file browser game. Tap to flap, thread the pipes, don't touch the ground.
+A full-screen, one-file browser game. Tap to flap, thread the pipes, don't touch the ground — and pick who does the flying.
 
 No build step, no dependencies, no assets — the entire game is a single `index.html` with a canvas and vanilla JavaScript.
 
@@ -26,12 +26,26 @@ python3 -m http.server 8000
 | Fullscreen | `F` or the corner button |
 | Restart | `R` |
 | Play again | tap after the game-over card |
+| Change character | tap a portrait in the picker, or press `1`–`4` |
+
+## Characters
+
+Four characters, switchable from the picker at the bottom of the screen. All of them fly on exactly the same physics and share the same hitbox, so the game is never easier or harder depending on who you pick — only the look, the tilt and the trail change. Your choice is remembered between visits.
+
+| Character | What it looks like |
+| --- | --- |
+| **Bird** | Beating wings, swaying tail, a beak that opens mid-stroke, blinking eye |
+| **Rocket** | Capsule body, red fins and nose cone, a flame that flickers and grows on every tap |
+| **Paper plane** | Two folded wings that flutter as it glides, with a crease down the middle |
+| **Auto-rickshaw** | Yellow-and-black body, spinning wheels, windshield and headlight |
+
+The title on the start screen follows your pick — BIRD FLIP, ROCKET FLIP, and so on.
 
 ## How it is built
 
 **Full screen, always.** The world uses a virtual coordinate space that is always 720 units tall; the width is derived from the viewport aspect ratio on every resize. So the canvas fills any phone, tablet, laptop or ultrawide monitor with no letterboxing and no stretched art — only more of the world becomes visible. Everything is drawn through one scaled transform at device pixel ratio, so it stays sharp on retina screens.
 
-**The bird.** The bird is drawn procedurally, not from a sprite sheet:
+**The character.** Every character is drawn procedurally, not from a sprite sheet. The bird, as the most detailed one:
 
 - Wings that beat continuously on a smooth sine cycle, the way a real bird flies — a tap briefly widens and speeds up the stroke instead of starting one from rest.
 - Separate back wing, front wing with layered feathers, tail that sways against vertical velocity, and a beak that opens slightly mid-stroke.
@@ -54,6 +68,10 @@ Mute state is remembered between visits.
 **Scenery.** A three-stop sky gradient with a sun halo, drifting volumetric clouds, far birds, two parallax hill ridges, a tree-line silhouette, and a scrolling ground with grass blades and dirt texture. Every layer is drawn from a seamlessly repeating pattern — the ridges are sums of sines whose wavelengths divide the tile exactly, and the trees are keyed to their world index — so nothing ever pops or jumps as it scrolls past. A vignette sits over the whole scene.
 
 **Game feel.** Particle puffs on each flap, sparks on each point, a feather burst on impact, screen shake and a white flash on death, a score counter that rolls up instead of jumping, medals (Bronze 5, Silver 12, Gold 25, Platinum 40), and a best score saved in `localStorage`. The game pauses itself to the title screen when you switch tabs so you never lose a run to a background tab.
+
+## Adding your own character
+
+Add an entry to the `SKINS` array near the top of the script, write a `drawX(g, s)` function that draws it around the origin facing right (about 36 units long), and add one line to `drawSkin`. The picker builds itself from the array, and the portrait is painted with the same drawing code, so a new character shows up everywhere at once.
 
 ## Structure
 
