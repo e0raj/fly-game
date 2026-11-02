@@ -33,9 +33,9 @@ python3 -m http.server 8000
 
 **The bird.** The bird is drawn procedurally, not from a sprite sheet:
 
-- A two-stage wing stroke — a fast downstroke on every tap that settles into a gentle idle flutter — driven by a damped interpolation, so it never snaps.
+- Wings that beat continuously on a smooth sine cycle, the way a real bird flies — a tap briefly widens and speeds up the stroke instead of starting one from rest.
 - Separate back wing, front wing with layered feathers, tail that sways against vertical velocity, and a beak that opens slightly mid-stroke.
-- Rotation eases toward a target derived from velocity, giving a smooth dive-and-climb arc instead of a linear tilt.
+- The nose snaps up on a tap and holds while the bird climbs, then noses over at a steady rate as it falls — the arc that makes the original game feel the way it does.
 - Squash and stretch on flap, plus velocity-based stretch while falling.
 - A pupil that tracks vertical motion and a random blink every few seconds.
 - A soft ground shadow that shrinks as the bird climbs.
@@ -49,7 +49,9 @@ python3 -m http.server 8000
 
 Mute state is remembered between visits.
 
-**Scenery.** A three-stop sky gradient with a sun halo, drifting volumetric clouds, far birds, two parallax hill ridges, a tree-line silhouette, and a scrolling ground with grass blades and dirt texture. A vignette sits over the whole scene.
+**Physics.** Gravity, a flap impulse and a terminal fall speed, run on a fixed 240 Hz timestep with one render per animation frame. The bird moves identically on a 60 Hz phone and a 144 Hz monitor, and the scrolling can never stutter or drift.
+
+**Scenery.** A three-stop sky gradient with a sun halo, drifting volumetric clouds, far birds, two parallax hill ridges, a tree-line silhouette, and a scrolling ground with grass blades and dirt texture. Every layer is drawn from a seamlessly repeating pattern — the ridges are sums of sines whose wavelengths divide the tile exactly, and the trees are keyed to their world index — so nothing ever pops or jumps as it scrolls past. A vignette sits over the whole scene.
 
 **Game feel.** Particle puffs on each flap, sparks on each point, a feather burst on impact, screen shake and a white flash on death, a score counter that rolls up instead of jumping, medals (Bronze 5, Silver 12, Gold 25, Platinum 40), and a best score saved in `localStorage`. The game pauses itself to the title screen when you switch tabs so you never lose a run to a background tab.
 
@@ -67,15 +69,16 @@ Inside the file the code is split into clearly labelled sections: tuning, state,
 The feel lives in a handful of constants near the top of the script:
 
 ```js
-const GRAVITY    = 2100;  // px/s²
-const FLAP       = -615;  // upward impulse
-const GAP        = 196;   // pipe gap height
-const SPACING    = 318;   // distance between pipes
-const BASE_SPEED = 235;   // starting scroll speed
-const MAX_SPEED  = 375;   // speed cap
+const GRAVITY    = 1480;  // px/s²
+const FLAP       = -505;  // upward impulse
+const MAX_FALL   = 940;   // terminal velocity
+const GAP        = 186;   // pipe gap height
+const SPACING    = 276;   // distance between pipes
+const BASE_SPEED = 205;   // starting scroll speed
+const MAX_SPEED  = 320;   // speed cap
 ```
 
-Easier: widen `GAP` or lower `BASE_SPEED`. Harder: shrink the gap and raise `MAX_SPEED`.
+Easier: widen `GAP` or lower `BASE_SPEED`. Harder: shrink the gap and raise `MAX_SPEED`. For a floatier bird, lower `GRAVITY` and `FLAP` together; for a snappier one, raise both.
 
 ## License
 
