@@ -295,6 +295,7 @@
     newBest: false,
     hudScore: 0,
     scorePop: 0,
+    bestY: 74,
     ripples: [],
     popups: [],
     paused: false,
@@ -345,6 +346,20 @@
 
     bird.x = Math.max(108, Math.min(VW * 0.25, 290));
     makeScenery();
+    measureBestChip();
+  }
+
+  // keeps the BEST chip tucked just under the Instagram pill, notch and all
+  function measureBestChip() {
+    let cssBottom = 58;
+    try {
+      const el = document.querySelector ? document.querySelector(".ui.left") : null;
+      if (el && el.getBoundingClientRect) {
+        const r = el.getBoundingClientRect();
+        if (r && r.bottom) cssBottom = r.bottom;
+      }
+    } catch (e) {}
+    G.bestY = (cssBottom + 10) / scale;
   }
 
   /* ---------------------------------------------------------- audio */
@@ -1803,16 +1818,6 @@
     ctx.translate(bird.x, bird.y + bob);
     ctx.rotate(bird.rot * skin.rotMul);
 
-    // ground shadow
-    const distToFloor = (FLOOR_Y - bird.y) / FLOOR_Y;
-    ctx.save();
-    ctx.globalAlpha = 0.15 * (1 - distToFloor * 0.6);
-    ctx.fillStyle = "#000";
-    ctx.beginPath();
-    ctx.ellipse(2, FLOOR_Y - bird.y - 4, 18 * (1 - distToFloor * 0.35), 5.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
     ctx.scale(sx, sy);
     drawSkin(ctx, skin.id, {
       phase: bird.wingPhase,
@@ -1874,47 +1879,39 @@
     // wordmark, breathing very slightly
     const breathe = 1 + Math.sin(G.t * 1.5) * 0.012;
     ctx.save();
-    ctx.translate(cx, 172);
+    ctx.translate(cx, 166);
     ctx.scale(breathe, breathe);
-    ctx.font = "900 86px ui-rounded, Segoe UI, system-ui, sans-serif";
+    ctx.font = "900 92px ui-rounded, Segoe UI, system-ui, sans-serif";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 16;
-    ctx.strokeStyle = "rgba(12,30,48,.5)";
+    ctx.lineWidth = 15;
+    ctx.strokeStyle = "rgba(10,26,44,.55)";
     ctx.strokeText("FLY", 0, 0);
-    const tg = ctx.createLinearGradient(0, -44, 0, 42);
+    const tg = ctx.createLinearGradient(0, -48, 0, 46);
     tg.addColorStop(0, "#ffffff");
-    tg.addColorStop(0.55, "#ffe9a3");
-    tg.addColorStop(1, "#ffc53d");
+    tg.addColorStop(0.5, "#ffe9a3");
+    tg.addColorStop(1, "#ffbe2e");
     ctx.fillStyle = tg;
     ctx.fillText("FLY", 0, 0);
     ctx.restore();
 
-    // which character is flying
-    ctx.font = "800 13px ui-rounded, Segoe UI, system-ui, sans-serif";
+    // which character is flying — name between two hairlines
+    ctx.font = "800 12px ui-rounded, Segoe UI, system-ui, sans-serif";
     const label = skin.label;
-    const bw2 = Math.max(104, ctx.measureText(label).width + 44), bh2 = 32;
-    const bx2 = cx - bw2 / 2, by2 = 224 - bh2 / 2;
-    ctx.fillStyle = "rgba(10,26,42,.46)";
-    roundRect(ctx, bx2, by2, bw2, bh2, 16); ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.2)"; ctx.lineWidth = 1.4; ctx.stroke();
-    ctx.fillStyle = "#8ce07a";
-    ctx.beginPath(); ctx.arc(bx2 + 17, by2 + bh2 / 2, 3.2, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(label, bx2 + bw2 / 2 + 8, by2 + bh2 / 2 + 1);
+    const lw = ctx.measureText(label).width;
+    const ly = 228;
+    ctx.fillStyle = "rgba(255,233,163,.92)";
+    ctx.fillText(label, cx, ly);
+    ctx.strokeStyle = "rgba(255,255,255,.3)";
+    ctx.lineWidth = 1;
+    const inner = lw / 2 + 14, outer = inner + 30;
+    ctx.beginPath();
+    ctx.moveTo(cx - outer, ly); ctx.lineTo(cx - inner, ly);
+    ctx.moveTo(cx + inner, ly); ctx.lineTo(cx + outer, ly);
+    ctx.stroke();
 
-    ctx.font = "700 14px ui-rounded, Segoe UI, system-ui, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,.78)";
-    ctx.fillText("TAP  ·  FLAP  ·  DON'T CRASH", cx, 272);
-
-    if (G.best > 0) {
-      const bw = 150, bh = 36, bx = cx - bw / 2, by = 296;
-      ctx.fillStyle = "rgba(10,26,42,.42)";
-      roundRect(ctx, bx, by, bw, bh, 18); ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = "#ffe9a3";
-      ctx.font = "800 15px ui-rounded, Segoe UI, system-ui, sans-serif";
-      ctx.fillText("BEST  " + G.best, cx, by + bh / 2 + 1);
-    }
+    ctx.font = "700 13px ui-rounded, Segoe UI, system-ui, sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,.72)";
+    ctx.fillText("TAP  ·  FLAP  ·  DON'T CRASH", cx, 262);
 
     const pulse = 0.5 + 0.5 * Math.sin(G.t * 3.2);
     ctx.globalAlpha = 0.45 + pulse * 0.55;
@@ -1923,19 +1920,29 @@
     ctx.lineJoin = "round";
     ctx.lineWidth = 8;
     ctx.strokeStyle = "rgba(14,30,48,.35)";
-    ctx.strokeText("TAP TO START", cx, FLOOR_Y - 168);
-    ctx.fillText("TAP TO START", cx, FLOOR_Y - 168);
+    ctx.strokeText("TAP TO START", cx, FLOOR_Y - 150);
+    ctx.fillText("TAP TO START", cx, FLOOR_Y - 150);
     ctx.globalAlpha = 1;
-
-    ctx.font = "600 12px ui-rounded, Segoe UI, system-ui, sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,.5)";
-    ctx.fillText("SPACE / ↑ / W  ·  M mute  ·  F fullscreen", cx, FLOOR_Y - 140);
 
     // swipe hint, gently nudging left and right
     const nudge = Math.sin(G.t * 2.2) * 4;
     ctx.font = "700 12px ui-rounded, Segoe UI, system-ui, sans-serif";
     ctx.fillStyle = "rgba(255,255,255,.62)";
-    ctx.fillText("←   SWIPE TO CHANGE   →", cx + nudge, FLOOR_Y - 42);
+    ctx.fillText("←   SWIPE TO CHANGE   →", cx + nudge, FLOOR_Y - 44);
+
+    // best score, small, tucked in the top-left corner
+    if (G.best > 0) {
+      const txt = "BEST " + G.best;
+      ctx.font = "800 11px ui-rounded, Segoe UI, system-ui, sans-serif";
+      const bw = ctx.measureText(txt).width + 26;
+      const bx = 16, by = G.bestY || 74, bh = 26;
+      ctx.textAlign = "left";
+      ctx.fillStyle = "rgba(10,26,42,.45)";
+      roundRect(ctx, bx, by, bw, bh, 13); ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.16)"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = "rgba(255,233,163,.92)";
+      ctx.fillText(txt, bx + 13, by + bh / 2 + 1);
+    }
     ctx.restore();
   }
 
