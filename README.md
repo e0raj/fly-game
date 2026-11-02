@@ -87,16 +87,16 @@ Inside the file the code is split into clearly labelled sections: tuning, state,
 The feel lives in a handful of constants near the top of the script:
 
 ```js
-const GRAVITY    = 1480;  // px/s²
-const FLAP       = -505;  // upward impulse
-const MAX_FALL   = 940;   // terminal velocity
+const GRAVITY    = 640;   // px/s² — light, so the character glides
+const FLAP       = -305;  // upward impulse
+const MAX_FALL   = 330;   // terminal sink speed
 const GAP        = 186;   // pipe gap height
 const SPACING    = 276;   // distance between pipes
 const BASE_SPEED = 205;   // starting scroll speed
 const MAX_SPEED  = 320;   // speed cap
 ```
 
-Easier: widen `GAP` or lower `BASE_SPEED`. Harder: shrink the gap and raise `MAX_SPEED`. For a floatier bird, lower `GRAVITY` and `FLAP` together; for a snappier one, raise both.
+The flight is deliberately floaty rather than twitchy: a tap lifts you about 72 units and settles back in just under a second, so holding altitude takes a tap roughly every second, and a full-screen drop takes about two seconds — there is always time to react. Raise `GRAVITY` and `FLAP` together for a snappier, more classic-feeling arc; lower them for an even lazier glide. Widen `GAP` or lower `BASE_SPEED` to make it easier.
 
 ## License
 
