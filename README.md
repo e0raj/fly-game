@@ -25,11 +25,10 @@ Made by [@e0raj](https://instagram.com/e0raj) — the Instagram pill sits in the
 | --- | --- |
 | Lift | `Space` / `↑` / `W` / click / tap |
 | Mute | `M`, or Sound in the menu |
-| Pause | `P`, or Pause in the menu |
+| Pause | `P`, or just open the menu |
 | Restart | `R` |
 | Change character | swipe left / right, press `←` `→`, tap a portrait, or press `1`–`4` |
 | Difficulty | CHILL / NORMAL / INSANE in the menu |
-| Share your score | the SHARE SCORE button on the game-over screen |
 | Play again | tap after the game-over card |
 
 ## Characters
@@ -61,7 +60,23 @@ Three modes, chosen from the menu in the top-right corner and remembered between
 
 ## The menu
 
-Everything that is not the game itself lives behind one button. The top-right corner holds a hamburger that opens a small panel with the difficulty segmented control, Pause / Resume and the sound switch. Opening the menu mid-round pauses the game for you, tapping anywhere else closes it without flapping, and the panel never covers the playfield for long.
+Everything that is not the game itself lives behind one button. The top-right corner holds a hamburger that opens a small panel with:
+
+- your best score and top-five score
+- the difficulty segmented control
+- the sound switch
+- **How to play**, **About** and **Privacy** pages
+- the version number
+
+Opening the menu mid-round pauses the game for you, and tapping anywhere else closes it without flapping.
+
+## Pages
+
+The three pages open as a sheet from the bottom of the screen, so nothing ever navigates away from the game:
+
+- **How to play** — controls, the perfect-gap bonus, characters and difficulty.
+- **About** — what the game is, who made it, version, Instagram and source links.
+- **Privacy** — plainly states that nothing leaves the device and exactly what is stored locally.
 
 ## How it is built
 
@@ -78,8 +93,6 @@ Everything that is not the game itself lives behind one button. The top-right co
 **Scenery.** A three-stop sky gradient with a sun halo, drifting volumetric clouds, far birds, two parallax hill ridges, a tree-line silhouette, and a scrolling ground with grass blades and dirt texture. Every layer is drawn from a seamlessly repeating pattern — the ridges are sums of sines whose wavelengths divide the tile exactly, and the trees are keyed to their world index — so nothing ever pops or jumps as it scrolls past. A vignette sits over the whole scene.
 
 **Feel.** A ripple at the point you tap, particle puffs behind the character, sparks and a scale-pop on the score for every point, a feather burst and screen shake on impact, a rolling score counter, medals (Bronze 5, Silver 12, Gold 25, Platinum 40), confetti when you beat your best, and a local top five saved in `localStorage`. Pausing stops the simulation dead rather than freezing the screen mid-frame. On phones a short haptic tick lands on each lift and a longer buzz on a crash, and `prefers-reduced-motion` turns the shake and confetti off for anyone who asks for less movement.
-
-**Share card.** The game-over screen has a SHARE SCORE button that draws a 1080×1350 card — the character, your score, your best, the medal and `@e0raj` — then hands it to the system share sheet, or downloads it as a PNG where sharing files is not supported. It is sized for an Instagram story. The game pauses itself to the title screen when you switch tabs so you never lose a run to a background tab.
 
 **Sound.** All effects are synthesised live with the Web Audio API, so there are no audio files to download:
 
