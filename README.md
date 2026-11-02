@@ -72,7 +72,7 @@ Opening the menu mid-round pauses the game for you, and tapping anywhere else cl
 
 ## Pages
 
-The three pages open as a sheet from the bottom of the screen, so nothing ever navigates away from the game:
+The three pages are real pages — `how-to-play.html`, `about.html` and `privacy.html` — linked from the menu. They share `page.css` and each one links back to the game and across to the others:
 
 - **How to play** — controls, the perfect-gap bonus, characters and difficulty.
 - **About** — what the game is, who made it, version, Instagram and source links.
@@ -107,7 +107,13 @@ Mute state is remembered between visits.
 
 ```
 fly-game/
-└── index.html    # everything: markup, styles, game loop, rendering, audio
+├── index.html          # the game — markup, styles, loop, rendering, audio
+├── how-to-play.html    # controls, scoring, characters, difficulty
+├── about.html          # what the game is, version, links
+├── privacy.html        # what is stored locally, and what is not
+├── page.css            # shared stylesheet for the three pages
+├── README.md
+└── LICENSE
 ```
 
 Inside the file the code is split into labelled sections: tuning, characters, state, resize, audio, scenery, gameplay, input, the picker, update, drawing helpers, character drawing, HUD, render, and the animation loop.
